@@ -39,6 +39,15 @@
         <h3 class="tw-text-lg tw-font-medium">
           Saved Searches
         </h3>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="onSaveSearch()">
+          <mat-icon class="tw-mr-1">save</mat-icon>
+          Save Search
+        </button>
       </div>
 
       <table
@@ -71,35 +80,20 @@
      * Author: Mariia Gordieieva (mgordiei)
      * Task 106 - Editable search title header for Advanced Search Options
      -->
+     <!--
+     * Author: Daria Berezianska (dvydybor)
+     * Task 118 - Stylize the Search Title input to be above left aligned with the Search input and remove the Advanced Search title next to it
+
+     -->
     <div class="tw-flex tw-items-center tw-justify-between tw-mb-4">
-      <h3 class="tw-text-lg tw-font-medium">
-        Advanced Search
-      </h3>
-
-      <div class="tw-flex tw-items-center tw-gap-3">
-        <mat-form-field class="tw-w-64 tw-mb-0">
-          <mat-label>Search Title</mat-label>
-          <input
-            matInput
-            placeholder="Untitled search"
-            [(ngModel)]="data.searchTitle"
-            name="searchTitle" />
-        </mat-form-field>
-
-        <!--
-        * Author: Eihab Khudhair (ekhudhai)
-        * Task 115 - Stylized the Save Search button to match current app button style
-        * Task 119 - Move the Save Search button to the right hand side of the Search Title input
-        -->
-        <button
-          mat-flat-button
-          class="primary-button"
-          type="button"
-          (click)="onSaveSearch()">
-          <mat-icon class="tw-mr-1">save</mat-icon>
-          Save Search
-        </button>
-      </div>
+      <mat-form-field class="tw-w-full" subscriptSizing="dynamic">
+        <mat-label>Search Title</mat-label>
+        <input
+          matInput
+          placeholder="Search Title"
+          [(ngModel)]="data.searchTitle"
+          name="searchTitle" />
+      </mat-form-field>
     </div>
 
     <!--
