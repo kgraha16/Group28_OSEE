@@ -13,18 +13,20 @@
 import { Component, Input, computed, signal, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import {
 	// MatAutocomplete,
 	MatAutocompleteSelectedEvent,
 	// MatAutocompleteTrigger,
 } from '@angular/material/autocomplete';
 import { MatMenuModule } from '@angular/material/menu'; // Author: Kris Graham (kgraha16) Task 122 - Added MatMenu to stylize Column button.
-import { MatButton } from '@angular/material/button'; // Author: Kris Graham (kgraha16) Task 112 - Added MatButton to stylize New Search.
-import { MatCheckbox } from '@angular/material/checkbox';
+import { MatButtonModule } from '@angular/material/button'; // Author: Kris Graham (kgraha16) Task 112 - Added MatButton to stylize New Search.
+import { MatDividerModule } from '@angular/material/divider'; // Author: Kris Graham (kgraha16) Task 131 - Added MatDivider to divide Columns menu.
+import { MatCheckboxModule } from '@angular/material/checkbox';
 // import { MatChip, MatChipRemove, MatChipSet } from '@angular/material/chips';
 // import { MatOption } from '@angular/material/core';
 import { MatFormField, MatLabel, MatSuffix } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInput } from '@angular/material/input';
 import { MatIconButton } from '@angular/material/button';
 import { ArtifactUiService } from '@osee/shared/services';
@@ -39,21 +41,23 @@ import {
 	selector: 'osee-advanced-search-form',
 	imports: [
 		FormsModule,
+		CommonModule,
 		MatFormField,
 		MatLabel,
 		// MatChipSet,
 		// MatChip,
 		// MatChipRemove,
-		MatIcon,
 		MatInput,
 		MatSuffix,
 		MatIconButton, 
 		// MatAutocomplete,
 		// MatAutocompleteTrigger,
 		// MatOption,
-		MatCheckbox,
-		MatButton, // Author: Kris Graham (kgraha16) Task 112 - Added MatButton to stylize New Search.
+		MatCheckboxModule,
+		MatButtonModule, // Author: Kris Graham (kgraha16) Task 112 - Added MatButton to stylize New Search.
 		MatMenuModule, // Author: Kris Graham (kgraha16) Task 122 - Added MatStrokedButton to stylize Column button.
+		MatDividerModule, // Author: Kris Graham (kgraha16) Task 131 - Added MatDivider to divide Columns menu.
+		MatIconModule,
 	],
 	templateUrl: './advanced-search-form.component.html',
 })
@@ -67,16 +71,29 @@ export class AdvancedSearchFormComponent {
 
 	searchValue = '';
 
+	public showSearchError: boolean = false;
+
 	/** 
 	* Author: Kris Graham (kgraha16)
-	* Task 122 - Create available columns for Column customization button.
+	* Task 131 - Create base available columns for Column customization button.
 	*/
-	availableColumns = [
-		{ key: 'type', label: 'Type', visible: true },
+	baseColumns = [
 		{ key: 'id', label: 'ID', visible: true },
 		{ key: 'name', label: 'Name', visible: true },
-		{ key: 'attributes', label: 'Attributes', visible: true },
+		{ key: 'type', label: 'Type', visible: true }
 	];
+	
+	/** 
+		* Author: Kris Graham (kgraha16)
+		* Task 131 - Create available attribute columns for Column customization button.
+		*/
+	attributeColumns = computed(() =>
+		this.allAttributeTypes().map(attr => ({
+			key: `attr_${attr.id}`,
+			label: attr.name,
+			visible: false,
+		}))
+	);
 	
 	artifactTypes = toSignal(this.artifactService.allArtifactTypes);
 	_selectedArtifactTypes = new BehaviorSubject<NamedId[]>([]);
@@ -140,6 +157,15 @@ export class AdvancedSearchFormComponent {
 		);
 		this.attrTypesFilter.set('');
 	}
+	
+	/** 
+		* Author: Kris Graham (kgraha16)
+		* Task 131 - Create signal to get all attribute types for Columns menu checkboxes.
+		*/
+	allAttributeTypes = toSignal(
+		this.artifactService.allAttributeTypes,
+		{ initialValue: [] }
+	);
 
 	compareWith(o1: NamedId, o2: NamedId) {
 		return o1.id === o2.id;
@@ -161,13 +187,23 @@ export class AdvancedSearchFormComponent {
 
 	/**
 	 * Author: Daria Berezianska (dvydybor)
+	 * Task 125 - Change the input alarm from being a popup to being a red written text under the search input bar
+	 * 
 	 * Handler for the search button in the Advanced Search Options modal.
-	 * If the search field is empty show an alert prompting the user.
+	 * If the search field is empty show an alert under the field prompting the user.
 	 */
 	onSearch(): void {
 		if (!this.searchValue || this.searchValue.trim().length === 0) {
-			window.alert('Please enter value to search');
+			// show inline error under the field instead of a blocking alert
+			this.showSearchError = true;
 			return;
+		}
+		this.showSearchError = false;
+	}
+
+	onSearchValueChange(): void {
+		if (this.searchValue && this.searchValue.trim().length > 0) {
+			this.showSearchError = false;
 		}
 	}
 
