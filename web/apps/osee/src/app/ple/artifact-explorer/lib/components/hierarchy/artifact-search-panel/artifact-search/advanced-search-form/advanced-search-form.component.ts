@@ -71,6 +71,7 @@ export class AdvancedSearchFormComponent {
 
 	searchValue = '';
 	searchResults: any[] = [];  // Author: Sofiia Holovko (sholovko) Task 145 - Handle "no results found" state
+	isLoading: boolean = false;  // Author: Sofiia Holovko (sholovko) Task 144 - Show loading state during search
 
 	public showSearchError: boolean = false;
 
