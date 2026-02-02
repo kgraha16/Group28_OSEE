@@ -82,12 +82,6 @@ public interface ArtifactEndpoint {
       @QueryParam("attributeType") List<AttributeTypeToken> attributeTypes, @QueryParam("exact") boolean exactMatch,
       @QueryParam("searchById") boolean searchById);
 
-   @POST
-   @Path("savedSearch")
-   @Consumes(MediaType.APPLICATION_JSON)
-   @Produces(MediaType.APPLICATION_JSON)
-   SavedSearch saveSavedSearch(SavedSearch savedSearch);
-
    @GET
    @Path("type/related")
    @Produces(MediaType.APPLICATION_JSON)
