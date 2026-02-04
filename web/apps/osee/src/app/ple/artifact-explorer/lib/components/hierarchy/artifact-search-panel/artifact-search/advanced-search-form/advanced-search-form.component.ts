@@ -541,9 +541,7 @@ export class AdvancedSearchFormComponent {
 	}
 
 	onSearchValueChange(): void {
-		if (this.searchValue && this.searchValue.trim().length > 0) {
-			this.showSearchError = false;
-		}
+			this.showSearchError = false;  // Author: Mariia Gordieieva (mgordiei) Task 156 - Improve empty-search inline validation UX.
 	}
 
 	/**
