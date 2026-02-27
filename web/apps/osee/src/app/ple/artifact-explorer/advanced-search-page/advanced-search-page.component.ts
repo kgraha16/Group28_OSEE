@@ -730,6 +730,14 @@ export class AdvancedSearchPageComponent implements OnInit {
 
 	/**
 	 * Author: Eihab Khudhair (ekhudhai)
+	 * Task 205 - Reset row selection state (selection must not persist across searches/saved-state)
+	 */
+	private resetRowSelection(): void {
+		this.selectedRowIds.clear();
+	}
+
+	/**
+	 * Author: Eihab Khudhair (ekhudhai)
 	 * Task 204 - Check whether a row is selected
 	 */
 	isRowSelected(row: SearchResultRow): boolean {
@@ -993,6 +1001,11 @@ export class AdvancedSearchPageComponent implements OnInit {
 			if (Array.isArray(parsed.expandedIds)) {
 				this.expanded = new Set<string>(parsed.expandedIds);
 			}
+			/**
+			 * Author: Eihab Khudhair (ekhudhai)
+			 * Task 205 - Selection state must not be restored from persisted page state
+			 */
+			this.resetRowSelection();
 		} catch (e) {
 			console.warn(
 				'Task 178: failed to restore advanced search state',
@@ -1311,7 +1324,13 @@ export class AdvancedSearchPageComponent implements OnInit {
 		this.saveErrorMessage = '';
 		this.saveInProgress = true;
 		const query = (this.searchValue || '').trim();
-		const columns = this.visibleColumns().map((c) => c.key);
+		/**
+		 * Author: Eihab Khudhair (ekhudhai)
+		 * Task 205 - Exclude selection state/locked columns from saved search column state
+		 */
+		const columns = this.visibleColumns()
+			.map((c) => c.key)
+			.filter((k) => k !== 'select' && k !== 'relations');
 
 		this.artifactService
 			.saveSearch(title, query, columns)
@@ -1423,6 +1442,12 @@ export class AdvancedSearchPageComponent implements OnInit {
 		// Task 143 - clear results before running a new search
 		this.searchResults = [];
     this.searchResultsSig.set([]);
+
+		/**
+		 * Author: Eihab Khudhair (ekhudhai)
+		 * Task 205 - Clear selection when a new search is executed
+		 */
+		this.resetRowSelection();
 
 		forkJoin({
 			branchId: this.uiService.id.pipe(take(1)),
@@ -1662,6 +1687,12 @@ export class AdvancedSearchPageComponent implements OnInit {
 		//Author: Sofiia Holovko (sholovko) Task 145 - Clear search results on new search
 		this.searchResults = [];
     this.searchResultsSig.set([]);
+
+		/**
+		 * Author: Eihab Khudhair (ekhudhai)
+		 * Task 205 - Clear selection on New Search
+		 */
+		this.resetRowSelection();
 
 		/**
 		 * Author: Eihab Khudhair (ekhudhai)
