@@ -1357,6 +1357,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 		);
 	}
 
+	attributeSearch = signal<string>('');
 	attributeSortSelect = signal<AttributeSort>('selectedFirst');
 
 	sortedAttributeColumns = computed<ColumnConfig[]>(() => {
