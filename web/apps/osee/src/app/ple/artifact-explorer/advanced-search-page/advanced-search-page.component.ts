@@ -150,13 +150,6 @@ type SavedSearch = {
 	searchById?: boolean;
 };
 
-type SavedSearchRequest = SavedSearch & {
-	artifactTypes?: NamedId[];
-	attributeTypes?: NamedId[];
-	exactMatch?: boolean;
-	searchById?: boolean;
-};
-
 @Component({
 	selector: 'osee-advanced-search-page',
 	imports: [
@@ -1797,7 +1790,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 		}
 		this.editErrorMessage = '';
 		this.editSaveInProgress = true;
-		const updatedSearch: SavedSearchRequest = {
+		const updatedSearch: SavedSearch = {
 			...savedSearch,
 			title: updatedTitle,
 			query: (this.editingSearchQuery || '').trim(),
