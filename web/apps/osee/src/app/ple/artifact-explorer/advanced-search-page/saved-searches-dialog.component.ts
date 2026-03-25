@@ -222,7 +222,8 @@ export type SavedSearchesDialogResult =
 						<!-- View row -->
 						<tr
 							*ngIf="editingId() !== s.id"
-							class="hover:tw-bg-slate-50 dark:hover:tw-bg-slate-800/40 tw-transition-colors">
+							class="hover:tw-bg-slate-50 dark:hover:tw-bg-slate-800/40 tw-transition-colors tw-cursor-pointer"
+							(click)="onLoadSearch(s)">
 							<td class="tw-px-3 tw-py-2 tw-border-t tw-border-slate-700">{{ s.title }}</td>
 							<td class="tw-px-3 tw-py-2 tw-border-t tw-border-slate-700 tw-text-slate-500 dark:tw-text-slate-400">{{ s.query }}</td>
 							<td class="tw-px-3 tw-py-2 tw-border-t tw-border-slate-700 tw-text-slate-500 dark:tw-text-slate-400">{{ formatSelections(s.artifactTypes) }}</td>
