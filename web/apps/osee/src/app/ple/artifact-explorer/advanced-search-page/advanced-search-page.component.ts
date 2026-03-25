@@ -1593,6 +1593,11 @@ export class AdvancedSearchPageComponent implements OnInit {
 	});
 	
 	filteredAttributeColumns = computed<ColumnConfig[]>(() => {
+		const search = this.attributeSearch().toLowerCase().trim()
+		
+		return this.sortedAttributeColumns().filter(col =>
+			!search || col.label.toLowerCase().startsWith(search)
+		);
 	});
 
 	artifactTypes = toSignal(this.artifactService.allArtifactTypes);
