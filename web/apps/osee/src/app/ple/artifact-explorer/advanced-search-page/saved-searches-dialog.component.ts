@@ -449,6 +449,34 @@ export class SavedSearchesDialogComponent implements OnInit {
 			return av.localeCompare(bv) * dir;
 		});
 	});
+	
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 244 - Filter input state for the Saved Searches dialog
+	 */
+	readonly filterQuery = signal('');
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 244 - Filters sortedSearches by title or query text in real time
+	 */
+	readonly filteredSearches = computed<SavedSearch[]>(() => {
+		const q = (this.filterQuery() ?? '').trim().toLowerCase();
+		if (!q) return this.sortedSearches();
+		return this.sortedSearches().filter(
+			(s) =>
+				s.title.toLowerCase().includes(q) ||
+				(s.query ?? '').toLowerCase().includes(q)
+		);
+	});
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 244 - Clear the filter input
+	 */
+	clearFilter(): void {
+		this.filterQuery.set('');
+	}
 
 	/**
 	 * Author: Sofiia Holovko (sholovko)
