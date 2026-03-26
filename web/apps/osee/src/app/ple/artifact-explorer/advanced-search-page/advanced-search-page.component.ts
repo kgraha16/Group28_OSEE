@@ -1053,7 +1053,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 
 		dialogRef.afterClosed().pipe(take(1)).subscribe((result?: SavedSearchesDialogResult) => {
 			if (result?.action === 'load') {
-				this.applySavedSearch(result.savedSearch);
+				this.applySavedSearch(result.savedSearch, true);
 			}
 		});
 	}
@@ -1213,7 +1213,10 @@ export class AdvancedSearchPageComponent implements OnInit {
 		});
 	}
 
-	private applySavedSearch(savedSearch: SavedSearch): void {
+	private applySavedSearch(
+		savedSearch: SavedSearch,
+		executeSearch = false
+	): void {
 		this.data = {
 			...defaultAdvancedSearchCriteria,
 			searchTitle: savedSearch.title ?? '',
@@ -1230,6 +1233,14 @@ export class AdvancedSearchPageComponent implements OnInit {
 		this.searchValidationMessage.set('');
 		this._selectedArtifactTypes.next(this.data.artifactTypes);
 		this.persistAdvancedSearchState();
+
+		if (
+			executeSearch &&
+			(this.searchValue || '').trim().length > 0 &&
+			this.branchSelected()
+		) {
+			this.onSearch();
+		}
 	}
 
 	/**
