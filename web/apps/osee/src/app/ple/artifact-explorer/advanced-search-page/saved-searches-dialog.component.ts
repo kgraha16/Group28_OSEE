@@ -449,6 +449,19 @@ export class SavedSearchesDialogComponent implements OnInit {
 			return av.localeCompare(bv) * dir;
 		});
 	});
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 238 - Toggle sort: if same column flip direction, otherwise switch column and reset to ascending
+	 */
+	onSortBy(col: 'title' | 'query' | 'timestamp'): void {
+		if (this.sortColumn() === col) {
+			this.sortAsc.update((v) => !v);
+		} else {
+			this.sortColumn.set(col);
+			this.sortAsc.set(true);
+		}
+	}
 	
 	/**
 	 * Author: Sofiia Holovko (sholovko)
