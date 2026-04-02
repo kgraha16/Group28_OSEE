@@ -102,7 +102,7 @@ export type SavedSearchesDialogResult =
 						matInput
 						placeholder="Search by name or description..."
 						[ngModel]="filterQuery()"
-						(ngModelChange)="filterQuery.set($event)"
+					   (ngModelChange)="onFilterChange($event)"
 						name="savedSearchesFilter"
 						autocomplete="off" />
 					<div matSuffix class="tw-flex tw-items-center">
@@ -218,7 +218,7 @@ export type SavedSearchesDialogResult =
 					</tr>
 				</thead>
 				<tbody>
-					<ng-container *ngFor="let s of filteredSearches()">
+					<ng-container *ngFor="let s of pagedSearches()">
 
 						<!-- View row -->
 						<tr
@@ -353,7 +353,34 @@ export type SavedSearchesDialogResult =
 					</ng-container>
 				</tbody>
 			</table>
-
+          	<!--
+			 * Author: Sofiia Holovko (sholovko)
+			 * Task 242 - Pagination controls for the Saved Searches table
+			 -->
+			<div
+				*ngIf="!loading() && !errorMessage() && filteredSearches().length > pageSize"
+				class="tw-flex tw-items-center tw-justify-between tw-mt-3 tw-text-sm tw-text-slate-600 dark:tw-text-slate-300">
+				<button
+					mat-stroked-button
+					type="button"
+					[disabled]="currentPage() === 1"
+					(click)="prevPage()">
+					Previous
+				</button>
+				<span>
+					Page {{ currentPage() }} of {{ totalPages() }}
+					<span class="tw-text-slate-400 dark:tw-text-slate-500">
+						({{ filteredSearches().length }} total)
+					</span>
+				</span>
+				<button
+					mat-stroked-button
+					type="button"
+					[disabled]="currentPage() === totalPages()"
+					(click)="nextPage()">
+					Next
+				</button>
+			</div>
 			<!-- Edit feedback messages -->
 			<div *ngIf="editErrorMessage()" class="tw-text-red-600 tw-text-sm tw-mt-2">
 				{{ editErrorMessage() }}
@@ -372,6 +399,16 @@ export type SavedSearchesDialogResult =
 			<!-- Delete error message -->
 			<div *ngIf="deleteErrorMessage()" class="tw-text-red-600 tw-text-sm tw-mt-2">
 				{{ deleteErrorMessage() }}
+			</div>
+			<!--
+			 * Author: Sofiia Holovko (sholovko)
+			 * Task 254 - Show success notification after deleting a saved search
+			 -->
+			<div
+				*ngIf="deleteSuccessMessage()"
+				class="tw-text-green-600 tw-text-sm tw-mt-2 tw-flex tw-items-center tw-gap-1">
+				<mat-icon class="tw-text-base tw-text-green-600">check_circle</mat-icon>
+				{{ deleteSuccessMessage() }}
 			</div>
 		</div>
 
@@ -459,6 +496,15 @@ export class SavedSearchesDialogComponent implements OnInit {
 	 * Task 244 - Filter input state for the Saved Searches dialog
 	 */
 	readonly filterQuery = signal('');
+	
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 242 - Reset to page 1 when filter changes so user never lands on a missing page
+	 */
+	onFilterChange(value: string): void {
+		this.filterQuery.set(value);
+		this.currentPage.set(1);
+	}
 
 	/**
 	 * Author: Sofiia Holovko (sholovko)
@@ -480,6 +526,47 @@ export class SavedSearchesDialogComponent implements OnInit {
 	 */
 	clearFilter(): void {
 		this.filterQuery.set('');
+		this.currentPage.set(1);
+	}
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 242 - Pagination state for the Saved Searches dialog
+	 */
+	readonly pageSize = 10;
+	readonly currentPage = signal(1);
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 242 - Total number of pages derived from filtered results
+	 */
+	readonly totalPages = computed(() =>
+		Math.max(1, Math.ceil(this.filteredSearches().length / this.pageSize))
+	);
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 242 - Current page slice of filtered results
+	 */
+	readonly pagedSearches = computed<SavedSearch[]>(() => {
+		const page = this.currentPage();
+		const start = (page - 1) * this.pageSize;
+		return this.filteredSearches().slice(start, start + this.pageSize);
+	});
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 242 - Navigate to previous page
+	 */
+	prevPage(): void {
+		this.currentPage.update((p) => Math.max(1, p - 1));
+	}
+
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 242 - Navigate to next page
+	 */
+	nextPage(): void {
+		this.currentPage.update((p) => Math.min(this.totalPages(), p + 1));
 	}
 
 	// ── edit state ─────────────────────────────────────────────────────────
@@ -496,6 +583,11 @@ export class SavedSearchesDialogComponent implements OnInit {
 	readonly deletingId = signal<number | null>(null);
 	readonly deleteInProgress = signal(false);
 	readonly deleteErrorMessage = signal('');
+		/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 254 - Show success notification after deleting a saved search
+	 */
+	readonly deleteSuccessMessage = signal('');
 
 	// ── lifecycle ──────────────────────────────────────────────────────────
 	ngOnInit(): void {
@@ -675,6 +767,8 @@ export class SavedSearchesDialogComponent implements OnInit {
 				next: () => {
 					this.deleteInProgress.set(false);
 					this.deletingId.set(null);
+					this.deleteSuccessMessage.set('Search deleted successfully.');
+					setTimeout(() => this.deleteSuccessMessage.set(''), 3000);
 					this.loadSavedSearches();
 				},
 				error: (err: unknown) => {
