@@ -126,7 +126,6 @@ export type SavedSearchesDialogResult =
 					Showing {{ filteredSearches().length }} of {{ sortedSearches().length }} saved searches
 				</div>
 			</div>
-		<div class="tw-px-6 tw-py-4 tw-overflow-auto" style="min-width: 1080px; max-height: 60vh;">
 
 			<!-- Loading state -->
 			<div *ngIf="loading()" class="tw-flex tw-items-center tw-gap-2 tw-text-sm tw-text-slate-500 tw-py-4">
