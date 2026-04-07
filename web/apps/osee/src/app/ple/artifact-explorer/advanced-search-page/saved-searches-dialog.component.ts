@@ -15,6 +15,7 @@
  *********************************************************************/
 import {
 	Component,
+	HostListener,
 	inject,
 	OnInit,
 	signal,
@@ -588,9 +589,22 @@ export class SavedSearchesDialogComponent implements OnInit {
 	 */
 	readonly deleteSuccessMessage = signal('');
 
+
 	// ── lifecycle ──────────────────────────────────────────────────────────
 	ngOnInit(): void {
 		this.loadSavedSearches();
+	}
+	
+	/**
+	 * Author: Sofiia Holovko (sholovko)
+	 * Task 270 - Keyboard shortcut to close dialog
+	 */
+	@HostListener('document:keydown.escape')
+	onEscapeKey(): void {
+		if (this.editingId() !== null) {
+			return;
+		}
+		this.onClose();
 	}
 
 	// ── data loading ───────────────────────────────────────────────────────
