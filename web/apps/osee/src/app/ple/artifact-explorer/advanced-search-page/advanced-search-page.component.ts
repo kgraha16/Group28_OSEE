@@ -1268,6 +1268,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 			exactMatch: !!savedSearch.exactMatch,
 			searchById: !!savedSearch.searchById,
 		};
+		this.saveAsGlobal = !!savedSearch.global;
 		this.searchValue = savedSearch.query ?? '';
 		this.artTypesFilter.set('');
 		this.attrTypesFilter.set('');
@@ -1770,6 +1771,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 				attributeTypes: this.data.attributeTypes,
 				exactMatch: this.data.exactMatch,
 				searchById: this.data.searchById,
+				global: this.saveAsGlobal,
 			})
 			.pipe(take(1))
 			.subscribe({
