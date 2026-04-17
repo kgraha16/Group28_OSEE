@@ -128,7 +128,7 @@ export type SavedSearchesDialogResult =
 				<div
 					*ngIf="filterQuery().length"
 					class="tw-text-xs tw-text-slate-500 dark:tw-text-slate-400 tw-mt-1">
-					Showing {{ filteredSearches().length }} of {{ sortedSearches().length }} saved searches
+					Showing {{ filteredSearchCount() }} of {{ totalSearchCount() }} saved searches
 				</div>
 			</div>
 		<div style="min-width: 1080px;">
@@ -181,68 +181,6 @@ export type SavedSearchesDialogResult =
 			</div>
 
 			<!-- Searches table -->
-<<<<<<< HEAD
-			<table
-				*ngIf="!loading() && !errorMessage() && filteredSearches().length > 0"
-				class="tw-w-full tw-text-sm tw-text-left tw-border tw-border-slate-700 tw-rounded-lg tw-overflow-hidden">
-				<thead class="tw-bg-gray-100 dark:tw-bg-slate-800">
-					<!--
-					 * Author: Sofiia Holovko (sholovko)
-					 * Task 238 - Sortable column headers for Name, Description and Last Modified
-					 -->
-					<tr>
-						<th class="tw-px-3 tw-py-2">
-							<span class="tw-inline-flex tw-items-center tw-gap-1">
-								<span>Name</span>
-								<button
-									type="button"
-									class="tw-inline-flex tw-items-center tw-justify-center tw-p-0 tw-bg-transparent tw-border-0 tw-cursor-pointer tw-text-slate-700 dark:tw-text-slate-300"
-									aria-label="Sort by name"
-									(click)="onSortBy('title')">
-									<mat-icon class="tw-text-base" [attr.aria-hidden]="true">
-										{{ sortColumn() === 'title' ? (sortAsc() ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more' }}
-									</mat-icon>
-								</button>
-							</span>
-						</th>
-						<th class="tw-px-3 tw-py-2">
-							<span class="tw-inline-flex tw-items-center tw-gap-1">
-								<span>Description</span>
-								<button
-									type="button"
-									class="tw-inline-flex tw-items-center tw-justify-center tw-p-0 tw-bg-transparent tw-border-0 tw-cursor-pointer tw-text-slate-700 dark:tw-text-slate-300"
-									aria-label="Sort by description"
-									(click)="onSortBy('query')">
-									<mat-icon class="tw-text-base" [attr.aria-hidden]="true">
-										{{ sortColumn() === 'query' ? (sortAsc() ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more' }}
-									</mat-icon>
-								</button>
-							</span>
-						</th>
-						<th class="tw-px-3 tw-py-2">Artifact Types</th>
-						<th class="tw-px-3 tw-py-2">Attribute Types</th>
-						<th class="tw-px-3 tw-py-2">Exact Match</th>
-						<th class="tw-px-3 tw-py-2">Search by ID</th>
-						<th class="tw-px-3 tw-py-2">
-							<span class="tw-inline-flex tw-items-center tw-gap-1">
-								<span>Last Modified</span>
-								<button
-									type="button"
-									class="tw-inline-flex tw-items-center tw-justify-center tw-p-0 tw-bg-transparent tw-border-0 tw-cursor-pointer tw-text-slate-700 dark:tw-text-slate-300"
-									aria-label="Sort by last modified"
-									(click)="onSortBy('timestamp')">
-									<mat-icon class="tw-text-base" [attr.aria-hidden]="true">
-										{{ sortColumn() === 'timestamp' ? (sortAsc() ? 'arrow_drop_up' : 'arrow_drop_down') : 'unfold_more' }}
-									</mat-icon>
-								</button>
-							</span>
-						</th>
-						<th class="tw-px-3 tw-py-2">Actions</th>
-					</tr>
-				</thead>
-				<tbody>
-					<ng-container *ngFor="let s of filteredSearches()">
-=======
 			<section
 				#globalSearchesSection
 				id="global-searches"
@@ -278,7 +216,6 @@ export type SavedSearchesDialogResult =
 					</thead>
 					<tbody>
 						<ng-container *ngFor="let s of filteredGlobalSearches()">
->>>>>>> 72e0b34132 (Task 262 - Show personal and global searches in separate paginated tables in UI)
 
 						<!-- View row -->
 						<tr
@@ -651,87 +588,12 @@ export class SavedSearchesDialogComponent implements OnInit {
 	readonly loading = signal(false);
 	readonly errorMessage = signal('');
 
-	/**
-	 * Author: Sofiia Holovko (sholovko)
-	 * Task 238 - Track which column is active for sorting and its direction
-	 */
-	readonly sortColumn = signal<'title' | 'query' | 'timestamp'>('timestamp');
-	readonly sortAsc = signal(true);
+	readonly dateAsc = signal(true);
 
 	/**
 	 * Author: Sofiia Holovko (sholovko)
 	 * Task 238 - Sorted searches derived from raw list, active sort column and direction
 	 */
-<<<<<<< HEAD
-	readonly sortedSearches = computed<SavedSearch[]>(() => {
-		const col = this.sortColumn();
-		const dir = this.sortAsc() ? 1 : -1;
-		return [...this._searches()].sort((a, b) => {
-			if (col === 'timestamp') {
-				const at = typeof a.timestamp === 'number' ? a.timestamp : 0;
-				const bt = typeof b.timestamp === 'number' ? b.timestamp : 0;
-				return (at - bt) * dir;
-			}
-			const av = (a[col] ?? '').toLowerCase();
-			const bv = (b[col] ?? '').toLowerCase();
-			return av.localeCompare(bv) * dir;
-		});
-	});
-
-	/**
-	 * Author: Sofiia Holovko (sholovko)
-	 * Task 238 - Toggle sort: if same column flip direction, otherwise switch column and reset to ascending
-	 */
-	onSortBy(col: 'title' | 'query' | 'timestamp'): void {
-		if (this.sortColumn() === col) {
-			this.sortAsc.update((v) => !v);
-		} else {
-			this.sortColumn.set(col);
-			this.sortAsc.set(true);
-		}
-	}
-	
-	/**
-	 * Author: Sofiia Holovko (sholovko)
-	 * Task 244 - Filter input state for the Saved Searches dialog
-	 */
-	readonly filterQuery = signal('');
-
-	/**
-	 * Author: Sofiia Holovko (sholovko)
-	 * Task 244 - Filters sortedSearches by title or query text in real time
-	 */
-	readonly filteredSearches = computed<SavedSearch[]>(() => {
-		const q = (this.filterQuery() ?? '').trim().toLowerCase();
-		if (!q) return this.sortedSearches();
-		return this.sortedSearches().filter(
-			(s) =>
-				s.title.toLowerCase().includes(q) ||
-				(s.query ?? '').toLowerCase().includes(q)
-		);
-	});
-
-	/**
-	 * Author: Sofiia Holovko (sholovko)
-	 * Task 244 - Clear the filter input
-	 */
-	clearFilter(): void {
-		this.filterQuery.set('');
-	}
-
-	/**
-	 * Author: Sofiia Holovko (sholovko)
-	 * Task 238 - Toggle sort: if same column flip direction, otherwise switch column and reset to ascending
-	 */
-	onSortBy(col: 'title' | 'query' | 'timestamp'): void {
-		if (this.sortColumn() === col) {
-			this.sortAsc.update((v) => !v);
-		} else {
-			this.sortColumn.set(col);
-			this.sortAsc.set(true);
-		}
-	}
-=======
 	private sortSearches(searches: SavedSearch[]): SavedSearch[] {
 		const dir = this.dateAsc() ? 1 : -1;
 		return [...searches].sort((a, b) => {
@@ -747,7 +609,6 @@ export class SavedSearchesDialogComponent implements OnInit {
 	readonly sortedGlobalSearches = computed<SavedSearch[]>(() =>
 		this.sortSearches(this._globalSearches())
 	);
->>>>>>> 72e0b34132 (Task 262 - Show personal and global searches in separate paginated tables in UI)
 	
 	/**
 	 * Author: Sofiia Holovko (sholovko)
@@ -801,6 +662,10 @@ export class SavedSearchesDialogComponent implements OnInit {
 				? this.globalSearchesSection?.nativeElement
 				: this.privateSearchesSection?.nativeElement;
 		target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	}
+
+	toggleDateSort(): void {
+		this.dateAsc.update((v) => !v);
 	}
 
 	// ── edit state ─────────────────────────────────────────────────────────

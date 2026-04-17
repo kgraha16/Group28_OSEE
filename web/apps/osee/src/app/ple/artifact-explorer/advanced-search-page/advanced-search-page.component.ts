@@ -741,7 +741,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 	saveInProgress = false;
 	saveErrorMessage = '';
 	// Author: Sofiia Holovko (sholovko) Task 243 - Show success notification after a search is saved
-   saveSuccessMessage = '';
+	saveSuccessMessage = '';
 	// Task 261 - UI-only checkbox state for a future global-save option
 	saveAsGlobal = false;
 	// Author: Sofiia Holovko (sholovko) Task 197
@@ -2057,11 +2057,11 @@ export class AdvancedSearchPageComponent implements OnInit {
 		this.selectSearchResultsByArtifactType(normalized);
 	}
 
-  clearResultsFilters(): void {
-    this.selectedArtifactType.set(null);
-    this.resultsIdFilter.set('');
-    this.resultsIdExactMatch.set(false);
-  }
+	clearResultsFilters(): void {
+		this.selectedArtifactType.set(null);
+		this.resultsIdFilter.set('');
+		this.resultsIdExactMatch.set(false);
+	}
 
 	onSearch(): void {
 		const filter = (this.searchValue || '').trim();
