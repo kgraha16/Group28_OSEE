@@ -574,7 +574,7 @@
           * Author: Eihab Khudhair (ekhudhai)
           * Task 174 - Make Search Result rows clickable (right-click dropdown trigger)
           -->
-          <ng-container *ngFor="let result of filteredSearchResults()">
+          <ng-container *ngFor="let result of paginatedSearchResults()">
             <tr
               class="tw-cursor-context-menu hover:tw-bg-slate-800/40 tw-transition-colors"
               (contextmenu)="onRowRightClick($event, result)">
@@ -644,6 +644,37 @@
       * Task 174 - Right-click dropdown menu trigger for Search Result rows
       *
       -->
+       <!-- Task 267 - Pagination bar -->
+      <div
+        *ngIf="searchResultsSig().length > 0"
+        class="tw-flex tw-items-center tw-justify-between tw-mt-3 tw-text-sm tw-text-slate-600 dark:tw-text-slate-300">
+
+        <span>
+          Showing {{ (currentPage() - 1) * pageSize() + 1 }}–{{ paginationEnd() }}
+          of {{ filteredSearchResults().length }} results
+        </span>
+
+        <div class="tw-flex tw-items-center tw-gap-1">
+          <button mat-icon-button type="button" [disabled]="currentPage() === 1" (click)="prevPage()">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <span class="tw-px-2">Page {{ currentPage() }} of {{ totalPages() }}</span>
+          <button mat-icon-button type="button" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+
+        <mat-form-field class="tw-w-28" subscriptSizing="dynamic">
+          <mat-label>Per page</mat-label>
+          <mat-select [value]="pageSize()" (selectionChange)="pageSize.set($event.value); currentPage.set(1)">
+            <mat-option [value]="10">10</mat-option>
+            <mat-option [value]="25">25</mat-option>
+            <mat-option [value]="50">50</mat-option>
+            <mat-option [value]="100">100</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      
       <div
         class="tw-fixed tw-invisible"
         [style.left.px]="contextMenuPosition.x"

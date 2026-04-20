@@ -495,6 +495,32 @@ export class AdvancedSearchPageComponent implements OnInit {
 	selectedArtifactType = signal<string | null>(null);
 	resultsIdFilter = signal('');
 	resultsIdExactMatch = signal(false);
+	// Task 267 - Pagination, Sofiia Holovko
+currentPage = signal(1);
+pageSize = signal(25);
+
+totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredSearchResults().length / this.pageSize()))
+);
+
+paginatedSearchResults = computed<SearchResultRow[]>(() => {
+    const page = this.currentPage();
+    const size = this.pageSize();
+    const start = (page - 1) * size;
+    return this.filteredSearchResults().slice(start, start + size);
+});
+
+goToPage(n: number): void {
+    const clamped = Math.max(1, Math.min(n, this.totalPages()));
+    this.currentPage.set(clamped);
+}
+
+nextPage(): void { this.goToPage(this.currentPage() + 1); }
+prevPage(): void { this.goToPage(this.currentPage() - 1); }
+
+paginationEnd(): number {
+    return Math.min(this.currentPage() * this.pageSize(), this.filteredSearchResults().length);
+}
 
 	availableArtifactTypes = computed<string[]>(() => {
 		const set = new Set<string>();
@@ -1073,6 +1099,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 	 */
 	private refreshSearchResultsAfterMassEdit(): void {
 		this.resetRowSelection();
+		this.currentPage.set(1); // Task 267 - Reset pagination on new search
 		this.onSearch();
 	}
 	/**
@@ -1941,9 +1968,11 @@ export class AdvancedSearchPageComponent implements OnInit {
 			String(value).trim() === ''
 		) {
 			this.selectedArtifactType.set(null);
+			this.currentPage.set(1); // Task 267
 			return;
 		}
 		this.selectedArtifactType.set(String(value));
+		this.currentPage.set(1); // Task 267
 	}
 
 	clearResultsFilters(): void {
@@ -2233,6 +2262,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 	setResultsIdFilter(raw: string): void {
 		const digits = String(raw ?? '').replace(/\D+/g, '');
 		this.resultsIdFilter.set(digits);
+		this.currentPage.set(1); // Task 267
 	}
 
 	clearResultsIdFilter(): void {
@@ -2259,6 +2289,7 @@ export class AdvancedSearchPageComponent implements OnInit {
 		 * Task 205 - Clear selection on New Search
 		 */
 		this.resetRowSelection();
+		this.currentPage.set(1); // Task 267 - Reset pagination on new search, Sofiia Holovko
 
 		/**
 		 * Author: Eihab Khudhair (ekhudhai)
